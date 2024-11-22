@@ -1,0 +1,123 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    # ports:
+    #   - "2181:2181"
+    networks:
+      - payment-processing-platform
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    # ports:
+    #   - "9092:9092"
+    volumes:
+      - ./create-topics.sh:/scripts/create-topics.sh
+    command: >
+      sh -c "
+      /scripts/create-topics.sh &
+      /etc/confluent/docker/run
+      "
+    networks:
+      - payment-processing-platform
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: payment_user
+      POSTGRES_PASSWORD: payment_password
+      POSTGRES_DB: payment_db
+    # ports:
+    #   - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payment_user -d payment_db"]
+      interval: 10s
+      retries: 5
+    networks:
+      - payment-processing-platform
+
+  payment-service:
+    build:
+      context: ./payment-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment_db
+      SPRING_DATASOURCE_USERNAME: payment_user
+      SPRING_DATASOURCE_PASSWORD: payment_password
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+      - postgres
+    # ports:
+    #   - "8080:8080"
+    networks:
+      - payment-processing-platform
+
+  fraud-detection-service:
+    build:
+      context: ./fraud-detection-service
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+    # ports:
+    #   - "8081:8081"
+    networks:
+      - payment-processing-platform
+
+  settlement-service:
+    build:
+      context: ./settlement-service
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+    # ports:
+    #   - "8082:8082"
+    networks:
+      - payment-processing-platform
+
+  notification-service:
+    build:
+      context: ./notification-service
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+    # ports:
+    #   - "8083:8083"
+    networks:
+      - payment-processing-platform
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./webapp/html:/usr/share/nginx/html
+      - ./webapp/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - payment-service
+    networks:
+      - payment-processing-platform
+
+volumes:
+  postgres_data:
+
+networks:
+  payment-processing-platform:

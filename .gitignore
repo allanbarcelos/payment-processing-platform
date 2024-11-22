@@ -1,0 +1,110 @@
+# Ignorar arquivos temporários e backups
+*.iml
+*.ipr
+*.iws
+*.jar
+*.sw?
+*~
+.#*
+.DS_Store
+.attach_pid*
+.classpath
+.factorypath
+.metadata
+.project
+.recommenders
+.settings
+.springBeans
+.vscode
+
+# Pastas e arquivos específicos
+/code
+MANIFEST.MF
+_site/
+activemq-data
+bin
+build
+build.log
+dependency-reduced-pom.xml
+dump.rdb
+interpolated*.xml
+lib/
+manifest.yml
+out
+overridedb.*
+target
+.flattened-pom.xml
+secrets.yml
+.gradletasknamecache
+.sts4-cache
+.git-hooks/
+node_modules
+
+# Pastas e arquivos específicos de build
+/build/
+!/**/src/**/bin
+!/**/src/**/build
+
+# Propriedades específicas de desenvolvedor
+/build.properties
+/buildcharacter.properties
+
+# Arquivos gerados ao testar scripts localmente
+/jenkins.properties
+
+# IntelliJ
+/.idea
+**/.cache
+/src/intellij*/*.iml
+/src/intellij*/*.ipr
+/src/intellij*/*.iws
+
+# Visual Studio Code
+/.vscode
+
+# Diretórios de destino do SBT
+/target/
+/project/**/target/
+/test/macro-annot/target/
+/test/files/target/
+/test/target/
+/build-sbt/
+local.sbt
+jitwatch.out
+
+# Restarr
+/build-restarr/
+/target-restarr/
+
+# Metals e Bloop
+.metals
+.bloop
+project/**/metals.sbt
+.bsp
+
+# Arquivos de histórico
+.history
+
+# Rust
+debug/
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# RustRover
+#.idea/
+
+# Golang
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# Arquivos de ambiente
+.env
