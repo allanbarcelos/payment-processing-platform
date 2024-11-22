@@ -2,6 +2,7 @@
 
 ## Structure
 
+```
 payment-platform/
 ├── payment-service/
 │   ├── src/
@@ -14,3 +15,4 @@ payment-platform/
 │   ├── docker-compose.yml
 │   ├── postgres/  # Configuração do PostgreSQL
 ├── docker-compose.yml
+```
