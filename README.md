@@ -1,5 +1,10 @@
 # Payment Processing Platform
 
+- **Payment Service:** Manages payments.
+- **Notification Service:** Sends notifications to users.
+- **Fraud Detection Service:** Verifies the authenticity of transactions.
+- **Settlement Service:** Processes payment settlement.
+
 ## Structure
 
 ```
